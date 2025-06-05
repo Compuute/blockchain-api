@@ -1,31 +1,31 @@
+// src/app.js
+
 import express from "express";
-import blockRoutes from "./src/routes/blockRoutes.js";
-import { errorHandler } from "./src/utils/errorHandler.js";
 import "express-async-errors";
-import logger from "./src/utils/logger.js";
+import blockRoutes from "./routes/blockRoutes.mjs";
+import { errorHandler } from "./middleware/errorHandler.mjs";
+import logger from "./utilities/logger.mjs";
 
 const app = express();
 
-// Middleware: parsa JSON bodies in requests
+// Middleware
 app.use(express.json());
 
-// Centraliserad loggning av alla förfrågningar
+// Centraliserad loggning
 app.use((req, res, next) => {
-    logger.info(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
+  logger.info(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  next();
 });
 
-// Koppla på block-routes
-app.use('/api", blockRoutes);
+// Koppla på block‐routes under /api/blocks
+app.use("/api/blocks", blockRoutes);
 
-
-// 404-hantering för endpoints som inte finns.
+// 404‐hantering för endpoints som inte finns
 app.use((req, res, next) => {
-    res.status(404).json({ status: 'error', message: 'Endpoint hittades inte'});
+  res.status(404).json({ status: "error", message: "Endpoint hittades inte" });
 });
 
-// Centraliserad felhantering...
+// Centraliserad felhantering
 app.use(errorHandler);
 
 export default app;
-
